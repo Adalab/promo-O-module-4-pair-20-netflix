@@ -10,3 +10,4 @@ ReactDOM.render(
   </HashRouter>,
   document.querySelector('#root')
 );
+
