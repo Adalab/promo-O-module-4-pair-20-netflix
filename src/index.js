@@ -1,15 +1,33 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+const movies = require("./data/movies.json");
+
+// const movieId = require;
 
 // create and config server
 const server = express();
 server.use(cors());
 server.use(express.json());
+server.set("view engine", "ejs");
+
+// create motor de plantillas
+// server.get("/movie/:movieId", (req, res) => {
+//   console.log(req.params.movieId);
+// });
 
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
+});
+
+// Creo el API que estoy solicitando desde el front
+//Ruta/endpoint tipo GET ya que quiero devolver datos
+//API request > GET > //localhost:4000/movies
+
+server.get("/movies", (req, res) => {
+  const response = movies;
+  res.json(response);
 });
 
 //Servidor estático:
