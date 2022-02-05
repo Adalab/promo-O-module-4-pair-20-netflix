@@ -26,6 +26,7 @@ server.listen(serverPort, () => {
 //API request > GET > //localhost:4000/movies
 
 server.get("/movies", (req, res) => {
+  console.log(req.query);
   const genderFilterParam = req.query.gender;
   console.log(genderFilterParam);
 
