@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const movies = require("./data/movies.json");
+const dataMovies = require("./data/movies.json");
 
 // const movieId = require;
 
@@ -26,8 +26,16 @@ server.listen(serverPort, () => {
 //API request > GET > //localhost:4000/movies
 
 server.get("/movies", (req, res) => {
-  const response = movies;
-  res.json(response);
+  const genderFilterParam = req.query.gender;
+  console.log(genderFilterParam);
+
+  const filteredGenderMovies = dataMovies.movies.filter(
+    (movie) => movie.gender === genderFilterParam
+  );
+  console.log(filteredGenderMovies);
+  res.send(
+    filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
+  );
 });
 
 //Servidor estático:
