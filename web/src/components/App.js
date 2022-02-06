@@ -79,6 +79,7 @@ const App = () => {
   Como queremos que el back devuelva el id de la usuaria sendLoginToApi recibe el email y la contraseña que ella haya escrito.
   */
   const sendLoginToApi = (loginData) => {
+    console.log(loginData);
     // Limpiamos el error antes de enviar los datos al API
     setLoginErrorMessage("");
     // Enviamos los datos al API

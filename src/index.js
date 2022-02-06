@@ -1,43 +1,64 @@
 const express = require("express");
 const cors = require("cors");
-const dataMovies = require("./data/movies.json");
 
-// const movieId = require;
+const dataMovies = require("./data/movies.json");
+const users = require("./data/users.json");
 
 // create and config server
+// could use const App instead of const server
 const server = express();
 server.use(cors());
 // nos permite usar body params en formato JSON
 server.use(express.json());
-server.set("view engine", "ejs");
-
-// create motor de plantillas
-// server.get("/movie/:movieId", (req, res) => {
-//   console.log(req.params.movieId);
-// });
 
 // init express aplication
+
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
+// ENDPOINTS
 // Creo el API que estoy solicitando desde el front
 //Ruta/endpoint tipo GET ya que quiero devolver datos
 //API request > GET > //localhost:4000/movies
 
 server.get("/movies", (req, res) => {
-  console.log(req.query);
   const genderFilterParam = req.query.gender;
-  console.log(genderFilterParam);
 
   const filteredGenderMovies = dataMovies.movies.filter(
     (movie) => movie.gender === genderFilterParam
   );
-  console.log(filteredGenderMovies);
+
   res.send(
     filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
   );
+});
+
+//Ruta/endpoint tipo POST ya que quiero devolver un dato (userId) que depende de otros datos (user, login)
+//API request > POST > //localhost:4000/login
+server.post("/login", (req, res) => {
+  console.log(req.body);
+  const emailUserReq = req.body.email;
+  const passwordUserReq = req.body.password;
+
+  const findUser = users.find(
+    (user) => user.email === emailUserReq && user.password === passwordUserReq
+  );
+  console.log(findUser);
+
+  if (findUser) {
+    res.send({
+      success: true,
+      userId: "id_de_la_usuaria_encontrada",
+    });
+  } else {
+    res.send({
+      success: false,
+      errorMessage:
+        "Usuaria/o no encontrada/o, por favor compruebe los datos introducidos",
+    });
+  }
 });
 
 //Servidor estático:
