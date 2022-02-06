@@ -7,6 +7,7 @@ const dataMovies = require("./data/movies.json");
 // create and config server
 const server = express();
 server.use(cors());
+// nos permite usar body params en formato JSON
 server.use(express.json());
 server.set("view engine", "ejs");
 

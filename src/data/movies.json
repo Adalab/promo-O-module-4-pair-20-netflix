@@ -6,14 +6,14 @@
         "title": "Gambita de dama",
         "gender": "Drama",
         "image":
-          "//beta.adalab.es/curso-intensivo-fullstack-recursos/apis/netflix-v1/images/gambito-de-dama.jpg"
+          "//localhost:4000/gambito-de-dama.jpg"
       },
       {
         "id": "2",
         "title": "Friends",
         "gender": "Comedia",
         "image":
-          "//beta.adalab.es/curso-intensivo-fullstack-recursos/apis/netflix-v1/images/friends.jpg"
+          "//localhost:4000/friends.jpg"
       },
       {
         "id": "3",
