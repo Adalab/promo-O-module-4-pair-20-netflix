@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const Database = require("better-sqlite3");
 
 const dataMovies = require("./data/movies.json");
 const users = require("./data/users.json");
@@ -10,6 +11,8 @@ const server = express();
 server.use(cors());
 // nos permite usar body params en formato JSON
 server.use(express.json());
+//confirg. motor de plantillas:
+server.set("view engine", "ejs");
 
 // init express aplication
 
@@ -59,6 +62,22 @@ server.post("/login", (req, res) => {
         "Usuaria/o no encontrada/o, por favor compruebe los datos introducidos",
     });
   }
+});
+
+//   4.4 Express JS III: - 1. Obtener el id de la película a renderizar:
+
+server.get("/movie/:movieId", (req, res) => {
+  const moviesId = req.params.movieId;
+  // console.log(moviesId);
+  //2. Obtener la película:
+  const foundMovie = dataMovies.movies.find(
+    (eachmovie) => eachmovie.id === moviesId
+  );
+//  console.log(foundMovie);
+  // res.json(foundMovie);
+
+  // //3. Renderiza una página cualquiera (ejs):
+  res.render("movie", foundMovie); //movie: carpeta ejs
 });
 
 //Servidor estático:
