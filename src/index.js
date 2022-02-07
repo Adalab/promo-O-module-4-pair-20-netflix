@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const Database = require("better-sqlite3");
+const database = require("better-sqlite3");
 
 const dataMovies = require("./data/movies.json");
 const users = require("./data/users.json");
@@ -26,16 +26,26 @@ server.listen(serverPort, () => {
 //Ruta/endpoint tipo GET ya que quiero devolver datos
 //API request > GET > //localhost:4000/movies
 
+// utilizar la base de datos:
+//quitamos la carpeta "db" de la ruta
+const db = new database("./src/database.db", { verbose: console.log });
+
 server.get("/movies", (req, res) => {
-  const genderFilterParam = req.query.gender;
+  // const genderFilterParam = req.query.gender;
+  // const filteredGenderMovies = dataMovies.movies.filter(
+  //   (movie) => movie.gender === genderFilterParam
+  // );
+  // res.send(
+  //  filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
+  // );
+  
+  //SELECT - base de datos:
 
-  const filteredGenderMovies = dataMovies.movies.filter(
-    (movie) => movie.gender === genderFilterParam
-  );
+const query = db.prepare("SELECT * FROM movies");
+const movies = query.all();
+console.log(movies);
 
-  res.send(
-    filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
-  );
+res.json(movies);
 });
 
 //Ruta/endpoint tipo POST ya que quiero devolver un dato (userId) que depende de otros datos (user, login)
@@ -73,7 +83,7 @@ server.get("/movie/:movieId", (req, res) => {
   const foundMovie = dataMovies.movies.find(
     (eachmovie) => eachmovie.id === moviesId
   );
-//  console.log(foundMovie);
+  //  console.log(foundMovie);
   // res.json(foundMovie);
 
   // //3. Renderiza una página cualquiera (ejs):
