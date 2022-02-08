@@ -38,14 +38,37 @@ server.get("/movies", (req, res) => {
   // res.send(
   //  filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
   // );
-  
+
   //SELECT - base de datos:
 
-const query = db.prepare("SELECT * FROM movies");
-const movies = query.all();
-console.log(movies);
+  const queryAll = db.prepare("SELECT * FROM movies ORDER BY name");
+  const queryGender = db.prepare(
+    "SELECT * FROM movies WHERE gender = ? ORDER BY name"
+  );
+  const queryAllOrderByDsc = db.prepare(
+    "SELECT * FROM movies ORDER BY name DESC"
+  );
+  const queryGenderOrderByDsc = db.prepare(
+    "SELECT * FROM movies WHERE gender = ? ORDER BY name DESC"
+  );
+  const movies = queryAll.all();
+  const genderFilterParam = req.query.gender;
+  const sortFilterParam = req.query.sort;
+  const moviesGender = queryGender.all(genderFilterParam); //trae ordenadas por nombre
+  const moviesSortedGender = queryAllOrderByDsc.all(genderFilterParam);
+  const moviesSorted = queryAllOrderByDsc.all();
+  if (moviesGender.length !== 0 && sortFilterParam === "desc") {
+    res.send(queryGenderOrderByDsc);
+  } else if (moviesGender.length !== 0 && sortFilterParam === "asc") {
+    res.send(queryGender);
+  } else if (moviesGender.length === 0 && sortFilterParam === "desc") {
+    res.send(moviesSorted);
+  } else if (moviesGender.length === 0 && sortFilterParam === "asc") {
+    res.send(movies);
+  }
 
-res.json(movies);
+  console.log(movies);
+
 });
 
 //Ruta/endpoint tipo POST ya que quiero devolver un dato (userId) que depende de otros datos (user, login)
