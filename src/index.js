@@ -92,16 +92,21 @@ server.post("/login", (req, res) => {
   }
 });
 
-//   4.4 Express JS III: - 1. Obtener el id de la película a renderizar:
+//   4.4 Express JS III: - 1. Obtener el id de la película a renderizar/ actualizado con BBDD
 
 server.get("/movie/:movieId", (req, res) => {
-  const moviesId = req.params.movieId;
-  const foundMovie = dataMovies.movies.find(
-    (eachmovie) => eachmovie.id === moviesId
-  );
+  //req
+  const moviesIdReq = req.params.movieId;
+  //query
+  const query = db.prepare("SELECT * FROM movies WHERE id = ?");
+  //run query - con get nos da el 1º resultado que cumple la condición marcada por req
+  const foundMovie = query.get(moviesIdReq);
+  res.render("movie", foundMovie);
 
-  // //3. Renderiza una página cualquiera (ejs):
-  res.render("movie", foundMovie); //movie: carpeta ejs
+  //Ejercicio previo a BBDD:
+  //const foundMovie = dataMovies.movies.find(
+  //   (eachmovie) => eachmovie.id === moviesId
+  // );
 });
 
 //Servidor estático:
