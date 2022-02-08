@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const database = require("better-sqlite3");
+const Database = require("better-sqlite3");
 
 const dataMovies = require("./data/movies.json");
 const users = require("./data/users.json");
@@ -27,48 +27,43 @@ server.listen(serverPort, () => {
 //API request > GET > //localhost:4000/movies
 
 // utilizar la base de datos:
-//quitamos la carpeta "db" de la ruta
-const db = new database("./src/database.db", { verbose: console.log });
+
+const db = new Database("./src/db/database.db", {
+  verbose: console.log(),
+});
 
 server.get("/movies", (req, res) => {
-  // const genderFilterParam = req.query.gender;
-  // const filteredGenderMovies = dataMovies.movies.filter(
-  //   (movie) => movie.gender === genderFilterParam
-  // );
-  // res.send(
-  //  filteredGenderMovies.length === 0 ? dataMovies.movies : filteredGenderMovies
-  // );
-
-  //SELECT - base de datos:
-
+  //prepare queries
+  console.log(req.query);
   const queryAll = db.prepare("SELECT * FROM movies ORDER BY name");
+  const queryAllSortDesc = db.prepare(
+    "SELECT * FROM movies ORDER BY name DESC"
+  );
   const queryGender = db.prepare(
     "SELECT * FROM movies WHERE gender = ? ORDER BY name"
   );
-  const queryAllOrderByDsc = db.prepare(
-    "SELECT * FROM movies ORDER BY name DESC"
-  );
-  const queryGenderOrderByDsc = db.prepare(
+  const queryGenderSortDesc = db.prepare(
     "SELECT * FROM movies WHERE gender = ? ORDER BY name DESC"
   );
-  const movies = queryAll.all();
-  const genderFilterParam = req.query.gender;
-  const sortFilterParam = req.query.sort;
-  const moviesGender = queryGender.all(genderFilterParam); //trae ordenadas por nombre
-  const moviesSortedGender = queryAllOrderByDsc.all(genderFilterParam);
-  const moviesSorted = queryAllOrderByDsc.all();
-  if (moviesGender.length !== 0 && sortFilterParam === "desc") {
-    res.send(queryGenderOrderByDsc);
-  } else if (moviesGender.length !== 0 && sortFilterParam === "asc") {
-    res.send(queryGender);
-  } else if (moviesGender.length === 0 && sortFilterParam === "desc") {
-    res.send(moviesSorted);
-  } else if (moviesGender.length === 0 && sortFilterParam === "asc") {
-    res.send(movies);
+  //req
+  const genderFilterParams = req.query.gender;
+  const sortFilterParams = req.query.sort;
+  //run queries
+  const allMovies = queryAll.all();
+  const allMoviesSorted = queryAllSortDesc.all();
+  const moviesGender = queryGender.all(genderFilterParams);
+  const moviesSortedGender = queryGenderSortDesc.all(genderFilterParams);
+
+  //res
+  if (moviesGender.length !== 0 && sortFilterParams === "desc") {
+    res.send(moviesSortedGender);
+  } else if (moviesGender.length !== 0 && sortFilterParams === "asc") {
+    res.send(moviesGender);
+  } else if (moviesGender.length === 0 && sortFilterParams === "desc") {
+    res.send(allMoviesSorted);
+  } else if (moviesGender.length === 0 && sortFilterParams === "asc") {
+    res.send(allMovies);
   }
-
-  console.log(movies);
-
 });
 
 //Ruta/endpoint tipo POST ya que quiero devolver un dato (userId) que depende de otros datos (user, login)
@@ -101,13 +96,9 @@ server.post("/login", (req, res) => {
 
 server.get("/movie/:movieId", (req, res) => {
   const moviesId = req.params.movieId;
-  // console.log(moviesId);
-  //2. Obtener la película:
   const foundMovie = dataMovies.movies.find(
     (eachmovie) => eachmovie.id === moviesId
   );
-  //  console.log(foundMovie);
-  // res.json(foundMovie);
 
   // //3. Renderiza una página cualquiera (ejs):
   res.render("movie", foundMovie); //movie: carpeta ejs
@@ -120,3 +111,7 @@ server.use(express.static(staticServerPath));
 //Servidor estático - IMAGENES:
 const staticServerImages = "./src/public-movies-images/";
 server.use(express.static(staticServerImages));
+
+//Servidor estático - CSS:
+const staticServerStyles = "./src/styles/";
+server.use(express.static(staticServerStyles));

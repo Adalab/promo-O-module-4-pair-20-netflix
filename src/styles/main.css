@@ -1,0 +1,16 @@
+.body {
+  margin: 10%;
+}
+
+.movie__title {
+  color: #145f58;
+
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.movie__gender {
+  color: #14d9c4;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
