@@ -34,7 +34,7 @@ const db = new Database("./src/db/database.db", {
 
 server.get("/movies", (req, res) => {
   //prepare queries
-  console.log(req.query);
+
   const queryAll = db.prepare("SELECT * FROM movies ORDER BY name");
   const queryAllSortDesc = db.prepare(
     "SELECT * FROM movies ORDER BY name DESC"
@@ -112,31 +112,30 @@ server.get("/movie/:movieId", (req, res) => {
 //Servidor sign-up:
 
 server.post("/sign-up", (req, res) => {
-
-   //prepare queries
- 
+  //req
+  const emailParams = req.body.email;
+  const passwordParams = req.body.password;
+  console.log(req.body);
+  //prepare queries
   const queryUserEmail = db.prepare("SELECT * FROM users WHERE email = ?");
   const foundUser = queryUserEmail.get(emailParams);
-    
-   //req
-    const emailParams = req.body.email;
-    const passwordParams = req.body.password;
-  )
-};
 
-if(foundUser === undefined){
-  const query = db.prepare("INSERT INTO users (email, password) VALUES (?,?)");
-  const newUserInsert = query.run(emailParams, passwordParams);
-  res.send({
-    success: true,
-    userId: "nuevo-id-añadido",
-  })
-}else{
-res.send({
-  success: false,
-  errorMessage: "Usuaria ya existente",
+  if (foundUser === undefined) {
+    const query = db.prepare(
+      "INSERT INTO users (email, password) VALUES (?,?)"
+    );
+    const newUserInsert = query.run(emailParams, passwordParams);
+    res.send({
+      success: true,
+      userId: newUserInsert.lastInsertRowid,
+    });
+  } else {
+    res.send({
+      success: false,
+      errorMessage: "Usuaria ya existente",
+    });
+  }
 });
-}
 
 //Servidor estático:
 const staticServerPath = "./src/public-react";

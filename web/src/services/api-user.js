@@ -18,16 +18,16 @@ const sendLoginToApi = (dataLogin) => {
 
 // signup
 
-const sendSingUpToApi = data => {
-  console.log('Se están enviando datos al signup:', data);
+const sendSingUpToApi = (data) => {
+  console.log("Se están enviando datos al signup:", data);
 
-  return fetch('http://localhost:4000/sing-up', {
+  return fetch("//localhost:4000/sign-up", {
     method: "POST",
     body: JSON.stringify(data),
-    headers: { "content-Type": "application/json"},
+    headers: { "content-Type": "application/json" },
   })
-    .then(response => response.json())
-    .then(() => {
+    .then((response) => response.json())
+    .then((data) => {
       console.log(data);
       return data;
     });
