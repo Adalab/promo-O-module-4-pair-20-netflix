@@ -6,35 +6,27 @@ const dataMovies = require("./data/movies.json");
 const users = require("./data/users.json");
 
 // create and config server
-// could use const App instead of const server
 const server = express();
 server.use(cors());
-// nos permite usar body params en formato JSON
 server.use(express.json());
-//confirg. motor de plantillas:
 server.set("view engine", "ejs");
 
 // init express aplication
-
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-// ENDPOINTS
-// Creo el API que estoy solicitando desde el front
-//Ruta/endpoint tipo GET ya que quiero devolver datos
-//API request > GET > //localhost:4000/movies
-
-// utilizar la base de datos:
-
+// DB
 const db = new Database("./src/db/database.db", {
   verbose: console.log(),
 });
 
 server.get("/movies", (req, res) => {
+  //req
+  const genderFilterParams = req.query.gender;
+  const sortFilterParams = req.query.sort;
   //prepare queries
-
   const queryAll = db.prepare("SELECT * FROM movies ORDER BY name");
   const queryAllSortDesc = db.prepare(
     "SELECT * FROM movies ORDER BY name DESC"
@@ -45,15 +37,10 @@ server.get("/movies", (req, res) => {
   const queryGenderSortDesc = db.prepare(
     "SELECT * FROM movies WHERE gender = ? ORDER BY name DESC"
   );
-  //req
-  const genderFilterParams = req.query.gender;
-  const sortFilterParams = req.query.sort;
-  //run queries
   const allMovies = queryAll.all();
   const allMoviesSorted = queryAllSortDesc.all();
   const moviesGender = queryGender.all(genderFilterParams);
   const moviesSortedGender = queryGenderSortDesc.all(genderFilterParams);
-
   //res
   if (moviesGender.length !== 0 && sortFilterParams === "desc") {
     res.send(moviesSortedGender);
@@ -66,18 +53,16 @@ server.get("/movies", (req, res) => {
   }
 });
 
-//Ruta/endpoint tipo POST ya que quiero devolver un dato (userId) que depende de otros datos (user, login)
-//API request > POST > //localhost:4000/login
 server.post("/login", (req, res) => {
-  console.log(req.body);
+  //req
   const emailUserReq = req.body.email;
   const passwordUserReq = req.body.password;
-
+  //prepare queries
   const findUser = users.find(
     (user) => user.email === emailUserReq && user.password === passwordUserReq
   );
-  console.log(findUser);
 
+  //res
   if (findUser) {
     res.send({
       success: true,
@@ -92,34 +77,24 @@ server.post("/login", (req, res) => {
   }
 });
 
-//   4.4 Express JS III: - 1. Obtener el id de la película a renderizar/ actualizado con BBDD
-
 server.get("/movie/:movieId", (req, res) => {
   //req
   const moviesIdReq = req.params.movieId;
-  //query
+  //prepare queries
   const query = db.prepare("SELECT * FROM movies WHERE id = ?");
-  //run query - con get nos da el 1º resultado que cumple la condición marcada por req
   const foundMovie = query.get(moviesIdReq);
+  //res
   res.render("movie", foundMovie);
-
-  //Ejercicio previo a BBDD:
-  //const foundMovie = dataMovies.movies.find(
-  //   (eachmovie) => eachmovie.id === moviesId
-  // );
 });
-
-//Servidor sign-up:
 
 server.post("/sign-up", (req, res) => {
   //req
   const emailParams = req.body.email;
   const passwordParams = req.body.password;
-  console.log(req.body);
   //prepare queries
   const queryUserEmail = db.prepare("SELECT * FROM users WHERE email = ?");
   const foundUser = queryUserEmail.get(emailParams);
-
+  //res
   if (foundUser === undefined) {
     const query = db.prepare(
       "INSERT INTO users (email, password) VALUES (?,?)"
@@ -137,14 +112,11 @@ server.post("/sign-up", (req, res) => {
   }
 });
 
-//Servidor estático:
 const staticServerPath = "./src/public-react";
 server.use(express.static(staticServerPath));
 
-//Servidor estático - IMAGENES:
 const staticServerImages = "./src/public-movies-images/";
 server.use(express.static(staticServerImages));
 
-//Servidor estático - CSS:
 const staticServerStyles = "./src/styles/";
 server.use(express.static(staticServerStyles));
